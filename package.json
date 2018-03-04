@@ -1,9 +1,16 @@
 {
   "name": "apod-wallpaper",
   "version": "1.0.0",
-  "description": "Astronomy Picture of the Day Wallpaper is a cross-platform desktop application that automatically changes your wallpaper to an amazing cosmic picture of the day ✨",
+  "description":
+    "Astronomy Picture of the Day Wallpaper is a cross-platform desktop application that automatically changes your wallpaper to an amazing cosmic picture of the day ✨",
   "main": "index.js",
   "repository": "git@github.com:nicolasiensen/apod-wallpaper.git",
   "author": "Nícolas Iensen",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^1.8.2"
+  }
 }
