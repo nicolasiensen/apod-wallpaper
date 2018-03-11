@@ -3,7 +3,9 @@ const { APOD, setNasaApiKey } = require("nasa-sdk");
 const wallpaper = require("wallpaper");
 const download = require("download");
 
-const mb = menubar();
+const mb = menubar({
+  icon: "build/tray-icon.png"
+});
 
 const setWallpaper = () => {
   return APOD.fetch()

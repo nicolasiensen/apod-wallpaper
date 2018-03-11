@@ -4,4 +4,4 @@ Astronomy Picture of the Day Wallpaper is a cross-platform desktop application t
 
 ## Credits
 
-"[Telescope](https://thenounproject.com/term/telescope/389646/)" icon by [Creative Stall](http://www.creativestall.com/) from the [Noun Project](http://thenounproject.com/).
+"Telescope" icon by [Jakub Ukrop](https://thenounproject.com/dill/) from the [Noun Project](http://thenounproject.com/).
