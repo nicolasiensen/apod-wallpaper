@@ -14,6 +14,9 @@
   },
   "build": {
     "appId": "com.nicolasiensen.apod-wallpaper",
+    "extraResources": [
+      ".env"
+    ],
     "mac": {
       "category": "public.app-category.utilities"
     }
@@ -24,6 +27,7 @@
     "electron-builder": "^20.4.1"
   },
   "dependencies": {
+    "dotenv": "^5.0.1",
     "download": "^6.2.5",
     "menubar": "^5.2.3",
     "nasa-sdk": "^1.1.10",

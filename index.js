@@ -2,6 +2,11 @@ const menubar = require("menubar");
 const { APOD, setNasaApiKey } = require("nasa-sdk");
 const wallpaper = require("wallpaper");
 const download = require("download");
+const path = require("path");
+
+process.resourcesPath = process.env.PWD ? process.env.PWD : process.resourcesPath;
+
+require('dotenv').config({ path: path.join(process.resourcesPath, ".env") })
 
 const mb = menubar({
   icon: "build/tray-icon.png"
