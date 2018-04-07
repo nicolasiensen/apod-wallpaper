@@ -15,6 +15,7 @@
   "build": {
     "appId": "com.nicolasiensen.apod-wallpaper",
     "extraResources": [
+      "build/tray-icon*",
       ".env"
     ],
     "mac": {

@@ -9,7 +9,7 @@ process.resourcesPath = process.env.PWD ? process.env.PWD : process.resourcesPat
 require('dotenv').config({ path: path.join(process.resourcesPath, ".env") })
 
 const mb = menubar({
-  icon: "build/tray-icon.png"
+  icon: path.join(process.resourcesPath, "build", "tray-icon.png")
 });
 
 const setWallpaper = () => {
