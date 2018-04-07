@@ -3,6 +3,7 @@ const { APOD, setNasaApiKey } = require("nasa-sdk");
 const wallpaper = require("wallpaper");
 const download = require("download");
 const path = require("path");
+const os = require("os");
 
 process.resourcesPath = process.env.PWD ? process.env.PWD : process.resourcesPath;
 
@@ -12,21 +13,24 @@ const mb = menubar({
   icon: path.join(process.resourcesPath, "build", "tray-icon.png")
 });
 
-const setWallpaper = () => {
+const setWallpaper = (imagesPath) => {
   return APOD.fetch()
     .then(apod => new Promise((resolve, reject) => resolve(apod["hdurl"])))
     .then(
       url =>
         new Promise((resolve, reject) => {
-          download(url, "./images").then(() => resolve(url));
+          download(url, imagesPath).then(() => resolve(url));
         })
     )
-    .then(url => wallpaper.set(`./images/${url.replace(/^.*[\\\/]/, "")}`))
+    .then(url => wallpaper.set(path.join(imagesPath, url.replace(/^.*[\\\/]/, ""))))
     .then(() => console.log("done"));
 };
 
 mb.on("ready", function ready() {
   setNasaApiKey(process.env.NASA_API_KEY);
-  setWallpaper();
+
+  const imagesPath = path.join(os.tmpdir(), "com.nicolasiensen.apod-wallpaper")
+  setWallpaper(imagesPath);
+
   setInterval(setWallpaper, 24 * 60 * 60 * 1000);
 });
