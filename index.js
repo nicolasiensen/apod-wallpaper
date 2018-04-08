@@ -13,8 +13,8 @@ const mb = menubar({
   icon: path.join(process.resourcesPath, "build", "tray-icon.png")
 });
 
-const setWallpaper = (imagesPath) => {
-  return APOD.fetch()
+const setWallpaper = (imagesPath, date) => {
+  return APOD.fetch({ date: `${date.getFullYear()}-${("0" + (date.getMonth() + 1)).slice(-2)}-${("0" + date.getDate()).slice(-2)}` })
     .then(apod => new Promise((resolve, reject) => resolve(apod["hdurl"])))
     .then(
       url =>
@@ -26,11 +26,22 @@ const setWallpaper = (imagesPath) => {
     .then(() => console.log("done"));
 };
 
+const getToday = () => {
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  return today;
+}
+
 mb.on("ready", function ready() {
   setNasaApiKey(process.env.NASA_API_KEY);
-
+  let wallpaperSetAt = getToday();
   const imagesPath = path.join(os.tmpdir(), "com.nicolasiensen.apod-wallpaper")
-  setWallpaper(imagesPath);
+  setWallpaper(imagesPath, wallpaperSetAt);
 
-  setInterval(setWallpaper, 24 * 60 * 60 * 1000);
+  setInterval(() => {
+    if (wallpaperSetAt.valueOf() !== getToday().valueOf()) {
+      wallpaperSetAt = getToday();
+      setWallpaper(imagesPath, wallpaperSetAt);
+    }
+  }, 10000);
 });
