@@ -10,7 +10,7 @@
     "start": "electron .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
-    "test": "jest"
+    "test": "jest --watch"
   },
   "build": {
     "appId": "com.nicolasiensen.apod-wallpaper",
