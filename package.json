@@ -34,5 +34,8 @@
     "menubar": "^5.2.3",
     "nasa-sdk": "^1.1.10",
     "wallpaper": "^2.6.0"
+  },
+  "jest": {
+    "clearMocks": true
   }
 }
