@@ -10,13 +10,22 @@ process.resourcesPath = process.env.PWD ? process.env.PWD : process.resourcesPat
 require('dotenv').config({ path: path.join(process.resourcesPath, ".env") })
 
 const mb = menubar({
-  icon: path.join(process.resourcesPath, "build", "tray-icon.png")
+  icon: path.join(process.resourcesPath, "build", "tray-icon.png"),
+  preloadWindow: true
 });
 
 mb.on("ready", function ready() {
   setNasaApiKey(process.env.NASA_API_KEY);
   const imagesPath = path.join(os.tmpdir(), "com.nicolasiensen.apod-wallpaper");
-  const wallpaperManager = new WallpaperManager(APOD, imagesPath);
+
+  const wallpaperManager = new WallpaperManager(
+    APOD,
+    imagesPath,
+    wallpaper => {
+      mb.window.webContents.send('onWallpaperSet', wallpaper);
+      mb.showWindow();
+    }
+  );
 
   wallpaperManager.setWallpaper();
   wallpaperManager.enableDailyWallpaper();
