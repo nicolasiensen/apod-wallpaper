@@ -11,6 +11,7 @@ jest.mock("nasa-sdk");
 const date = new Date("2018/04/21");
 const hdurl = "https://apod.nasa.gov/apod/image/1804/FalconTessLaunchKraus.jpg";
 const imagesPath = "/images/path/";
+const callback = jest.fn();
 let wallpaperManager;
 
 global.Date = jest.fn(() => date);
@@ -19,7 +20,7 @@ download.mockImplementation(url => Promise.resolve(url));
 
 describe("WallpaperManager", () => {
   beforeEach(async () => {
-    wallpaperManager = new WallpaperManager(APOD, imagesPath);
+    wallpaperManager = new WallpaperManager(APOD, imagesPath, callback);
     await wallpaperManager.setWallpaper();
   })
 
@@ -34,6 +35,10 @@ describe("WallpaperManager", () => {
 
     it("should set the wallpaper with the downloaded APOD", () => {
       expect(wallpaper.set).toHaveBeenCalledWith(imagesPath + "FalconTessLaunchKraus.jpg");
+    });
+
+    it("should call the callback with the wallpaper", () => {
+      expect(callback).toHaveBeenCalledWith({ hdurl });
     });
 
     describe("when the wallpaper was already set", () => {
@@ -51,6 +56,10 @@ describe("WallpaperManager", () => {
 
       it("should not set the wallpaper with the downloaded APOD again", () => {
         expect(wallpaper.set).toHaveBeenCalledTimes(1);
+      });
+
+      it("should not call the callback", () => {
+        expect(callback).toHaveBeenCalledTimes(1);
       });
     });
   });
