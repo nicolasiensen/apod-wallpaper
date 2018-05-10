@@ -24,16 +24,16 @@
   },
   "postinstall": "electron-builder install-app-deps",
   "devDependencies": {
-    "electron": "^1.8.2",
+    "electron": "^2.0.0",
     "electron-builder": "^20.4.1",
     "jest": "^22.4.3"
   },
   "dependencies": {
     "dotenv": "^5.0.1",
-    "download": "^6.2.5",
+    "download": "^7.0.0",
     "menubar": "^5.2.3",
     "nasa-sdk": "^1.1.10",
-    "wallpaper": "^2.6.0"
+    "wallpaper": "^3.0.0"
   },
   "jest": {
     "clearMocks": true
