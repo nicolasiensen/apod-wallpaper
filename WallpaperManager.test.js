@@ -11,61 +11,114 @@ jest.mock("nasa-sdk");
 const date = new Date("2018/04/21");
 const hdurl = "https://apod.nasa.gov/apod/image/1804/FalconTessLaunchKraus.jpg";
 const imagesPath = "/images/path/";
-const callback = jest.fn();
-let wallpaperManager;
+const onWallpaperUpdateComplete = jest.fn();
+const onWallpaperUpdateStart = jest.fn();
+const onWallpaperUpdateFail = jest.fn();
 
+const initializeWallpaperManager = () => new WallpaperManager(APOD, imagesPath, {
+  onWallpaperUpdateStart,
+  onWallpaperUpdateComplete,
+  onWallpaperUpdateFail
+});
+
+download.mockResolvedValue(undefined);
+wallpaper.set.mockResolvedValue(undefined);
 global.Date = jest.fn(() => date);
-APOD.fetch.mockResolvedValue({ hdurl });
-download.mockImplementation(url => Promise.resolve(url));
 
 describe("WallpaperManager", () => {
-  beforeEach(async () => {
-    wallpaperManager = new WallpaperManager(APOD, imagesPath, callback);
-    await wallpaperManager.setWallpaper();
-  })
+  let wallpaperManager;
+
+  beforeEach(() => {
+    APOD.fetch.mockResolvedValue({ hdurl });
+  });
 
   describe("#setWallpaper", () => {
-    it("should fetch the APOD for today from the API", () => {
-      expect(APOD.fetch).toHaveBeenCalledWith({ date: "2018-04-21" });
-    });
-
-    it("should download the high definition APOD to the images folder", () => {
-      expect(download).toHaveBeenCalledWith(hdurl, imagesPath);
-    });
-
-    it("should set the wallpaper with the downloaded APOD", () => {
-      expect(wallpaper.set).toHaveBeenCalledWith(imagesPath + "FalconTessLaunchKraus.jpg");
-    });
-
-    it("should call the callback with the wallpaper", () => {
-      expect(callback).toHaveBeenCalledWith({ hdurl });
-    });
-
-    describe("when the wallpaper was already set", () => {
+    describe("when it succeeds to set the wallpaper", () => {
       beforeEach(async () => {
+        wallpaperManager = initializeWallpaperManager();
         await wallpaperManager.setWallpaper();
       });
 
-      it("should not fetch the APOD for today from the API again", () => {
+      it("should fetch the APOD for today from the API", () => {
+        expect(APOD.fetch).toHaveBeenCalledWith({ date: "2018-04-21" });
+      });
+
+      it("should download the high definition APOD to the images folder", () => {
+        expect(download).toHaveBeenCalledWith(hdurl, imagesPath);
+      });
+
+      it("should set the wallpaper with the downloaded APOD", () => {
+        expect(wallpaper.set).toHaveBeenCalledWith(imagesPath + "FalconTessLaunchKraus.jpg");
+      });
+
+      it("should trigger onWallpaperUpdateStart", () => {
+        expect(onWallpaperUpdateStart).toHaveBeenCalledTimes(1);
+      });
+
+      it("should trigger onWallpaperUpdateComplete", () => {
+        expect(onWallpaperUpdateComplete).toHaveBeenCalledWith({ hdurl });
+      });
+
+      it("should not trigger onWallpaperUpdateFail", () => {
+        expect(onWallpaperUpdateFail).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("when it fails to set the wallpaper", () => {
+      let error;
+
+      beforeEach(async () => {
+        error = new Error("Network error");
+        APOD.fetch.mockRejectedValue(error);
+        wallpaperManager = initializeWallpaperManager();
+        await wallpaperManager.setWallpaper();
+      });
+
+      it("should trigger onWallpaperUpdateStart", () => {
+        expect(onWallpaperUpdateStart).toHaveBeenCalledTimes(1);
+      });
+
+      it("should not trigger onWallpaperUpdateComplete", () => {
+        expect(onWallpaperUpdateComplete).not.toHaveBeenCalled();
+      });
+
+      it("should trigger onWallpaperUpdateFail", () => {
+        expect(onWallpaperUpdateFail).toHaveBeenCalledWith(error);
+      });
+    });
+
+    describe("when its called twice for the same day", () => {
+      beforeEach(async () => {
+        wallpaperManager = initializeWallpaperManager();
+        await wallpaperManager.setWallpaper();
+        await wallpaperManager.setWallpaper();
+      });
+
+      it("should fetch the APOD just once", () => {
         expect(APOD.fetch).toHaveBeenCalledTimes(1);
       });
 
-      it("should not download the high definition APOD to the images folder again", () => {
+      it("should download the high definition APOD to the images folder just once", () => {
         expect(download).toHaveBeenCalledTimes(1);
       });
 
-      it("should not set the wallpaper with the downloaded APOD again", () => {
+      it("should set the wallpaper with the downloaded APOD just once", () => {
         expect(wallpaper.set).toHaveBeenCalledTimes(1);
       });
 
-      it("should not call the callback", () => {
-        expect(callback).toHaveBeenCalledTimes(1);
+      it("should trigger onWallpaperUpdateStart just once", () => {
+        expect(onWallpaperUpdateStart).toHaveBeenCalledTimes(1);
+      });
+
+      it("should trigger onWallpaperUpdateComplete just once", () => {
+        expect(onWallpaperUpdateComplete).toHaveBeenCalledTimes(1);
       });
     });
   });
 
   describe("#enableDailyWallpaper", () => {
     it("should enable a timer to update the wallpaper every 10s", () => {
+      wallpaperManager = initializeWallpaperManager();
       wallpaperManager.setWallpaper = jest.fn()
       wallpaperManager.enableDailyWallpaper();
       jest.advanceTimersByTime(10000);
@@ -77,6 +130,7 @@ describe("WallpaperManager", () => {
 
   describe("#disableDailyWallpaper", () => {
     it("should disable the timer to update the wallpaper every 10s", () => {
+      wallpaperManager = initializeWallpaperManager();
       wallpaperManager.setWallpaper = jest.fn()
       wallpaperManager.enableDailyWallpaper();
       jest.advanceTimersByTime(10000);

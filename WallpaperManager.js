@@ -3,13 +3,19 @@ const download = require("download");
 const path = require("path");
 
 class WallpaperManager {
-  constructor(apodApi, imagesPath, callback) {
+  constructor(apodApi, imagesPath, options) {
     this.apodApi = apodApi;
     this.imagesPath = imagesPath;
-    this.callback = callback;
     this.date = null;
     this.currentWallpaperDate = null;
     this.interval = null;
+
+    this.options = {
+      onWallpaperUpdateStart: () => {},
+      onWallpaperUpdateComplete: () => {},
+      onWallpaperUpdateFail: () => {},
+      ...options
+    };
 
     this._updateDate();
 
@@ -27,6 +33,8 @@ class WallpaperManager {
   async setWallpaper() {
     if (this.currentWallpaperDate === null || this.currentWallpaperDate.valueOf() !== this.date.valueOf()) {
       try {
+        this.options.onWallpaperUpdateStart();
+
         const apod = await this.apodApi.fetch({
           date: `${this.date.getFullYear()}-${("0" + (this.date.getMonth() + 1)).slice(-2)}-${("0" + this.date.getDate()).slice(-2)}`
         });
@@ -36,9 +44,9 @@ class WallpaperManager {
         await download(apod["hdurl"], this.imagesPath);
         await wallpaper.set(path.join(this.imagesPath, fileName))
         this.currentWallpaperDate = this.date;
-        this.callback(apod);
+        this.options.onWallpaperUpdateComplete(apod);
       } catch(error) {
-        console.log(error)
+        this.options.onWallpaperUpdateFail(error);
       }
     }
   };
