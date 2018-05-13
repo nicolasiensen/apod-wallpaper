@@ -10,7 +10,6 @@ process.resourcesPath = process.env.PWD ? process.env.PWD : process.resourcesPat
 
 require('dotenv').config({ path: path.join(process.resourcesPath, ".env") })
 
-const mb = menubar({ preloadWindow: true });
 const trayIcon = path.join(process.resourcesPath, "build", `tray-icon.png`);
 
 const trayAnimationFrames = [
@@ -19,6 +18,8 @@ const trayAnimationFrames = [
   path.join(process.resourcesPath, "build", `tray-icon-loading-3.png`),
   path.join(process.resourcesPath, "build", `tray-icon-loading-4.png`)
 ]
+
+const mb = menubar({ preloadWindow: true, icon: trayIcon });
 
 mb.on("ready", function ready() {
   setNasaApiKey(process.env.NASA_API_KEY);
