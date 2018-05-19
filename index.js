@@ -10,13 +10,13 @@ process.resourcesPath = process.env.PWD ? process.env.PWD : process.resourcesPat
 
 require('dotenv').config({ path: path.join(process.resourcesPath, ".env") })
 
-const trayIcon = path.join(process.resourcesPath, "build", `tray-icon.png`);
+const trayIcon = path.join(process.resourcesPath, "build", `TrayIconTemplate.png`);
 
 const trayAnimationFrames = [
-  path.join(process.resourcesPath, "build", `tray-icon-loading-1.png`),
-  path.join(process.resourcesPath, "build", `tray-icon-loading-2.png`),
-  path.join(process.resourcesPath, "build", `tray-icon-loading-3.png`),
-  path.join(process.resourcesPath, "build", `tray-icon-loading-4.png`)
+  path.join(process.resourcesPath, "build", `TrayIconLoading1Template.png`),
+  path.join(process.resourcesPath, "build", `TrayIconLoading2Template.png`),
+  path.join(process.resourcesPath, "build", `TrayIconLoading3Template.png`),
+  path.join(process.resourcesPath, "build", `TrayIconLoading4Template.png`)
 ]
 
 const mb = menubar({ preloadWindow: true, icon: trayIcon });

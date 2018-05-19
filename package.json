@@ -16,7 +16,7 @@
     "productName": "APOD Wallpaper",
     "appId": "com.nicolasiensen.apod-wallpaper",
     "extraResources": [
-      "build/tray-icon*",
+      "build/TrayIcon*",
       ".env"
     ],
     "mac": {
