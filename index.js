@@ -3,8 +3,15 @@ const electron = require('electron');
 const { APOD, setNasaApiKey } = require("nasa-sdk");
 const path = require("path");
 const os = require("os");
+const AutoLaunch = require('auto-launch');
 const WallpaperManager = require("./WallpaperManager");
 const TrayIconManager = require("./TrayIconManager");
+
+var autoLauncher = new AutoLaunch({ name: 'APOD Wallpaper' });
+
+autoLauncher.isEnabled().then((isEnabled) => {
+  if (!isEnabled) autoLaunch.enable();
+});
 
 process.resourcesPath = process.env.PWD ? process.env.PWD : process.resourcesPath;
 
