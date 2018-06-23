@@ -20,7 +20,10 @@
       ".env"
     ],
     "mac": {
-      "category": "public.app-category.utilities"
+      "category": "public.app-category.utilities",
+      "extendInfo": {
+        "LSUIElement": 1
+      }
     }
   },
   "postinstall": "electron-builder install-app-deps",
@@ -33,7 +36,6 @@
     "auto-launch": "^5.0.5",
     "dotenv": "^5.0.1",
     "download": "^7.0.0",
-    "menubar": "^5.2.3",
     "nasa-sdk": "^1.1.10",
     "wallpaper": "^3.0.0"
   },

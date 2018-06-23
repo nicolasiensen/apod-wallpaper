@@ -1,11 +1,10 @@
-const menubar = require("menubar");
 const electron = require('electron');
 const { APOD, setNasaApiKey } = require("nasa-sdk");
 const path = require("path");
 const os = require("os");
 const AutoLaunch = require('auto-launch');
 const WallpaperManager = require("./WallpaperManager");
-const TrayIconManager = require("./TrayIconManager");
+const TrayManager = require("./TrayManager");
 
 var autoLauncher = new AutoLaunch({ name: 'APOD Wallpaper' });
 
@@ -26,25 +25,33 @@ const trayAnimationFrames = [
   path.join(process.resourcesPath, "build", `TrayIconLoading4Template.png`)
 ]
 
-const mb = menubar({ preloadWindow: true, icon: trayIcon });
-
-mb.on("ready", function ready() {
+electron.app.on("ready", function ready() {
   setNasaApiKey(process.env.NASA_API_KEY);
   const imagesPath = path.join(os.tmpdir(), "com.nicolasiensen.apod-wallpaper");
-  const trayIconManager = new TrayIconManager(mb.tray, trayIcon, trayAnimationFrames);
+  const trayManager = new TrayManager(trayIcon, trayAnimationFrames);
 
   const onWallpaperUpdateStart = () => {
-    trayIconManager.startAnimation();
+    trayManager.startAnimation();
   };
 
-  const onWallpaperUpdateComplete = wallpaper => {
-    trayIconManager.stopAnimation();
-    mb.window.webContents.send('onWallpaperSet', wallpaper);
-    mb.showWindow();
-  };
+  const onWallpaperUpdateComplete = (wallpaper) => {
+    const date = new Date(wallpaper.date);
+    const urlDate = wallpaper.date.replace(/-/g, "").slice(2);
+    const url = `https://apod.nasa.gov/apod/ap${urlDate}.html`
+    const menu = electron.Menu.buildFromTemplate([
+      { label: date.toDateString(), type: "normal", enabled: false },
+      { label: wallpaper.title, type: "normal", click: () => electron.shell.openExternal(url) },
+      { type: "separator" },
+      { label: "Quit", type: "normal", click: electron.app.quit }
+    ]);
+
+    trayManager.stopAnimation();
+    trayManager.setToolTip(wallpaper.title);
+    trayManager.setContextMenu(menu);
+  }
 
   const onWallpaperUpdateFail = error => {
-    trayIconManager.stopAnimation();
+    trayManager.stopAnimation();
     console.log("WallpaperManager error: ", error);
   };
 
@@ -53,8 +60,6 @@ mb.on("ready", function ready() {
     onWallpaperUpdateComplete,
     onWallpaperUpdateFail
   });
-
-  trayIconManager.setIcon();
 
   wallpaperManager.setWallpaper();
   wallpaperManager.enableDailyWallpaper();
